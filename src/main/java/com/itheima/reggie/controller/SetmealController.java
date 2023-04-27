@@ -132,6 +132,7 @@ public class SetmealController {
         return R.success(setmealDto);
     }
 
+
     /**
      * 修改套餐信息
      * @param setmealDto
@@ -145,6 +146,12 @@ public class SetmealController {
         return R.success("修改套餐信息成功");
     }
 
+    /**
+     * 更新套餐状态
+     * @param ids
+     * @param status
+     * @return
+     */
     @PostMapping("/status/{status}")
     public R<String> updateStatus(Long[] ids,@PathVariable int status){
         //将数组转为集合
@@ -158,5 +165,26 @@ public class SetmealController {
         log.info("status:{status}",status);
 
         return R.success("操作成功");
+    }
+
+
+    /**
+     * 根据分类id及状态查询套餐分类的套餐
+     * @param setmeal
+     * @return
+     */
+    @GetMapping("/list")
+    public R<List<Setmeal>> list(Setmeal setmeal){
+        //构造查询器
+        LambdaQueryWrapper<Setmeal> queryWrapper=new LambdaQueryWrapper<>();
+        //分类id不为空时查询
+        queryWrapper.eq(setmeal.getCategoryId()!=null,Setmeal::getCategoryId,setmeal.getCategoryId());
+        queryWrapper.eq(setmeal.getStatus()!=null,Setmeal::getStatus,setmeal.getStatus());
+        queryWrapper.orderByDesc(Setmeal::getUpdateTime);
+
+        //执行查询
+        List<Setmeal> setmealList = setmealService.list(queryWrapper);
+
+        return R.success(setmealList);
     }
 }
